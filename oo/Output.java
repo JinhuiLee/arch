@@ -1,23 +1,23 @@
 // -*- Java -*-
 /*
  * <copyright>
- * 
+ *
  *  Copyright (c) 2002
  *  Institute for Information Processing and Computer Supported New Media (IICM),
  *  Graz University of Technology, Austria.
- * 
+ *
  * </copyright>
- * 
+ *
  * <file>
- * 
+ *
  *  Name:    Output.java
- * 
+ *
  *  Purpose: Output prints sorted lines in a nice format
- * 
- *  Created: 24 Sep 2002 
- * 
+ *
+ *  Created: 24 Sep 2002
+ *
  *  $Id$
- * 
+ *
  *  Description:
  *    Output prints sorted lines in a nice format
  * </file>
@@ -66,10 +66,11 @@ public class Output{
  */
 
   public void print(Alphabetizer alphabetizer){
-    
+
         // iterate through all lines
+    //System.out.println(alphabetizer.getLineCount());
     for(int i = 0; i < alphabetizer.getLineCount(); i++)
-      
+
           // print current line
       System.out.println(alphabetizer.getLineAsString(i));
   }

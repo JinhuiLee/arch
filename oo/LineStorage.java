@@ -272,7 +272,7 @@ public class LineStorage{
   public void addWord(String chars, int line){
 
         // get the specified line
-    Line current_line = (Line) lines_.get(line);
+    Line current_line = (Line)lines_.get(line);
 
         // add the new word
     current_line.addWord(chars);
@@ -516,7 +516,7 @@ public class LineStorage{
     Line current_line = new Line();
 
         // add the new line at the end
-    current_line.addEmptyWord();
+    //current_line.addEmptyWord();
 
     lines_.add(current_line);
   }

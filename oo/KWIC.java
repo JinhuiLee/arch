@@ -110,7 +110,7 @@ public class KWIC{
         case "Add":
           System.out.print(">");
           line=input.getInput(false);
-          input.parseLine(line, lines);
+          input.parseLine(line.substring(0,line.length()), lines);
           // make all circular shifts of the original set of lines
           shifter.setup(lines);
           // sort all shifts alphabetically
