@@ -1,23 +1,23 @@
 // -*- Java -*-
 /*
  * <copyright>
- * 
+ *
  *  Copyright (c) 2002
  *  Institute for Information Processing and Computer Supported New Media (IICM),
  *  Graz University of Technology, Austria.
- * 
+ *
  * </copyright>
- * 
+ *
  * <file>
- * 
+ *
  *  Name:    KWIC.java
- * 
+ *
  *  Purpose: The Master Control class
- * 
- *  Created: 20 Sep 2002 
- * 
+ *
+ *  Created: 20 Sep 2002
+ *
  *  $Id$
- * 
+ *
  *  Description:
  *    The Master Control class
  * </file>
@@ -82,7 +82,7 @@ public class KWIC{
   public void execute(String file){
 
         // initialize all variables
-    
+
         // storage for original lines
     LineStorage lines = new LineStorage();
 
@@ -100,23 +100,45 @@ public class KWIC{
 
         // read and parse the input file
         // store results in the line storage instance
-    input.parse(file, lines);
+    while (Input.running)
+    {
+      String line=input.getInput(true);
 
-        // make all circular shifts of the original set of lines
-    shifter.setup(lines);
-    
-        // sort all shifts alphabetically
-    alphabetizer.alpha(shifter);
+      switch (line)
+      {
+        case "a":
+        case "Add":
+          System.out.print(">");
+          line=input.getInput(false);
+          input.parseLine(line, lines);
+          // make all circular shifts of the original set of lines
+          shifter.setup(lines);
+          // sort all shifts alphabetically
+          alphabetizer.alpha(shifter);
+          break;
+        case "p":
+        case "Print":
+          // print sorted shifts
+          output.print(alphabetizer);
+          break;
+        case "q":
+        case "Quit":
+          System.exit(0);
+          break;
 
-        // print sorted shifts
-    output.print(alphabetizer);
+
+      }
+
+
+
+    }
   }
 
 //----------------------------------------------------------------------
 /**
- * Main function checks the command line arguments. The program expects 
- * exactly one command line argument specifying the name of the file 
- * that contains the data. If the program has not been started with 
+ * Main function checks the command line arguments. The program expects
+ * exactly one command line argument specifying the name of the file
+ * that contains the data. If the program has not been started with
  * proper command line arguments, main function exits
  * with an error message. Otherwise, a KWIC instance is created and program
  * control is passed to it.
