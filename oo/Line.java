@@ -31,7 +31,6 @@ package kwic.oo;
 
 import java.util.ArrayList;
 
-
 /**
  *  An object of the LineStorage class holds a number of lines and provides a number of public methods
  *  to manipulate the lines. A line is defined as a set of words, and a word consists of a number of
@@ -53,7 +52,7 @@ import java.util.ArrayList;
  *  @version $Id$
 */
 
-public class LineStorage{
+public class Line{
 
 //----------------------------------------------------------------------
 /**
@@ -71,7 +70,7 @@ public class LineStorage{
  * automatically, and copies the elements of the old array into the new one.
  */
 
-  private ArrayList<Line> lines_ = new ArrayList<Line>();
+  private ArrayList words_ = new ArrayList();
 
 //----------------------------------------------------------------------
 /**
@@ -101,12 +100,25 @@ public class LineStorage{
  * @see #deleteChar
  */
 
-  public void setChar(char c, int position, int word, int line){
+  public void setChar(char c, int position, int word){
 
         // get the specified line
-    Line current_line = (Line) lines_.get(line);
+    ArrayList current_line = words_;
 
-    current_line.setChar(c,position,word);
+        // get the specified word
+    String current_word = (String) current_line.get(word);
+
+        // Get character representation of the specified word
+    char[] chars = current_word.toCharArray();
+
+        // set the new character at the specified positon
+    chars[position] = c;
+
+        // make new string represenation of the word
+    current_word = new String(chars);
+
+        // replace the old word with the new one
+    current_line.set(word, current_word);
   }
 
 //----------------------------------------------------------------------
@@ -122,8 +134,8 @@ public class LineStorage{
  * @see #deleteChar
  */
 
-  public char getChar(int position, int word, int line){
-    return lines_.get(line).getChar(position,word);
+  public char getChar(int position, int word){
+    return ((String)words_.get(word)).charAt(position);
   }
 
 //----------------------------------------------------------------------
@@ -138,13 +150,29 @@ public class LineStorage{
  * @see #deleteChar
  */
 
-  public void addChar(char c, int word, int line){
+  public void addChar(char c, int word){
 
         // get the specified line
-    Line current_line = lines_.get(line);
+    ArrayList current_line =(ArrayList) words_;
 
         // get the specified word
-    current_line.addChar(c,word);
+    String current_word = (String) current_line.get(word);
+
+        // create a new character array with the length of
+        // the old word increased by 1
+    char[] chars = new char[current_word.length() + 1];
+
+        // copy the old word into the new character array
+    current_word.getChars(0, chars.length - 1, chars, 0);
+
+        // add the new character at the end of the word
+    chars[chars.length - 1] = c;
+
+        // make new string represenation of the word
+    current_word = new String(chars);
+
+        // replace the old word with the new one
+    current_line.set(word, current_word);
   }
 
 //----------------------------------------------------------------------
@@ -160,13 +188,28 @@ public class LineStorage{
  * @see #addChar
  */
 
-  public void deleteChar(int position, int word, int line){
+  public void deleteChar(int position, int word){
 
         // get the specified line
-    Line current_line =  lines_.get(line);
+    ArrayList current_line = words_;
 
         // get the specified word
-    current_line.deleteChar(position,word);
+    String current_word = (String) current_line.get(word);
+
+        // create a new character array with the length of
+        // the old word decreased by 1
+    char[] chars = new char[current_word.length() - 1];
+
+        // copy the old word into the new character array
+        // skip the character that should be deleted
+    current_word.getChars(0, position, chars, 0);
+    current_word.getChars(position + 1, chars.length + 1, chars, position);
+
+        // make new string represenation of the word
+    current_word = new String(chars);
+
+        // replace the old word with the new one
+    current_line.set(word, current_word);
   }
 
 //----------------------------------------------------------------------
@@ -177,8 +220,8 @@ public class LineStorage{
  * @return int
  */
 
-  public int getCharCount(int word, int line){
-    return lines_.get(line).getCharCount(word);
+  public int getCharCount(int word){
+    return ((String)words_.get(word)).length();
   }
 
 //----------------------------------------------------------------------
@@ -195,8 +238,8 @@ public class LineStorage{
  * @see #deleteWord
  */
 
-  public void setWord(char[] chars, int word, int line){
-    setWord(new String(chars), word, line);
+  public void setWord(char[] chars, int word){
+    setWord(new String(chars), word);
   }
 
 //----------------------------------------------------------------------
@@ -213,13 +256,13 @@ public class LineStorage{
  * @see #deleteWord
  */
 
-  public void setWord(String chars, int word, int line){
+  public void setWord(String chars, int word){
 
         // get the specified line
-    Line current_line = (Line) lines_.get(line);
+    ArrayList current_line = words_;
 
         // replace the old word with the new one
-    current_line.setWord(chars,word);
+    current_line.set(word, chars);
   }
 
 //----------------------------------------------------------------------
@@ -235,8 +278,8 @@ public class LineStorage{
  * @see #deleteWord
  */
 
-  public String getWord(int word, int line){
-    return  lines_.get(line).getWord(word);
+  public String getWord(int word){
+    return (String) words_.get(word);
   }
 
 //----------------------------------------------------------------------
@@ -252,8 +295,8 @@ public class LineStorage{
  * @see #deleteWord
  */
 
-  public void addWord(char[] chars, int line){
-    addWord(new String(chars), line);
+  public void addWord(char[] chars){
+    addWord(new String(chars));
   }
 
 //----------------------------------------------------------------------
@@ -269,13 +312,13 @@ public class LineStorage{
  * @see #deleteWord
  */
 
-  public void addWord(String chars, int line){
+  public void addWord(String chars){
 
         // get the specified line
-    Line current_line = (Line) lines_.get(line);
+    ArrayList current_line = words_;
 
         // add the new word
-    current_line.addWord(chars);
+    current_line.add(chars);
   }
 
 //----------------------------------------------------------------------
@@ -289,13 +332,13 @@ public class LineStorage{
  * @see #deleteWord
  */
 
-  public void addEmptyWord(int line){
+  public void addEmptyWord(){
 
         // get the specified line
-    Line current_line = (Line) lines_.get(line);
+    ArrayList current_line = words_;
 
         // add the new word
-    current_line.addEmptyWord();
+    current_line.add(new String());
   }
 
 //----------------------------------------------------------------------
@@ -310,13 +353,13 @@ public class LineStorage{
  * @see #addEmptyWord
  */
 
-  public void deleteWord(int word, int line){
+  public void deleteWord(int word){
 
         // get the specified line
-    Line current_line = (Line) lines_.get(line);
+    ArrayList current_line = words_;
 
         // delete the specified word
-    current_line.deleteWord(word);
+    current_line.remove(word);
   }
 
 //----------------------------------------------------------------------
@@ -326,228 +369,10 @@ public class LineStorage{
  * @return int
  */
 
-  public int getWordCount(int line){
-    return lines_.get(line).getWordCount();
+  public int getWordCount(){
+    return words_.size();
   }
 
-//----------------------------------------------------------------------
-/**
- * This method sets a new line on the specified index.
- * This method takes two dimensional character array as an argument
- * for the line.
- * @param words new line
- * @param line line index
- * @return void
- * @see #getLine
- * @see #getLineAsString
- * @see #addLine
- * @see #addEmptyLine
- * @see #deleteLine
- */
-
-  public void setLine(char[][] words, int line){
-
-        // transform char[][] into String[]
-    String[] tmp = new String[words.length];
-    for(int i = 0; i < words.length; i++)
-      tmp[i] = new String(words[i]);
-
-    setLine(tmp, line);
-  }
-
-//----------------------------------------------------------------------
-/**
- * This method sets a new line on the specified index.
- * This method takes a string array as argument
- * @param words new line
- * @param line line index
- * @return void
- * @see #getLine
- * @see #getLineAsString
- * @see #addLine
- * @see #addEmptyLine
- * @see #deleteLine
- */
-
-  public void setLine(String[] words, int line){
-
-        // get the specified line
-    Line current_line = (Line) lines_.get(line);
-
-        // remove old words
-    for (String word: words)
-    {
-      current_line.addWord(word);
-    }
-  }
-
-//----------------------------------------------------------------------
-/**
- * Gets the line from the specified position.
- * String array representing the line is returned.
- * @param line line index
- * @return String[]
- * @see #setLine
- * @see #getLineAsString
- * @see #addLine
- * @see #addEmptyLine
- * @see #deleteLine
- */
-
-  public String[] getLine(int line){
-
-        // get the specified line
-    Line current_line = (Line) lines_.get(line);
-
-        // create the String[] representation of the line
-    String[] tmp = new String[current_line.getWordCount()];
-    for(int i = 0; i < current_line.getWordCount(); i++)
-      tmp[i] = (String) current_line.getWord(i);
-
-    return tmp;
-  }
-
-//----------------------------------------------------------------------
-/**
- * Gets the line from the specified position.
- * A single String representing the line is returned.
- * @param line line index
- * @return String
- * @see #setLine
- * @see #getLine
- * @see #addLine
- * @see #addEmptyLine
- * @see #deleteLine
- */
-
-  public String getLineAsString(int line){
-
-        // get the specified line
-    Line current_line = (Line) lines_.get(line);
-
-        // calculate the length of the line
-    int size = current_line.getWordCount();
-
-    int length = 0;
-    for(int i = 0; i < size; i++)
-      length += getWord(i, line).length();
-
-        // add the length of space characters delimiting the words
-    length += size - 1;
-
-        // initialize the char[]
-    char[] tmp = new char[length];
-
-        // create the String representation of the line
-    int count = 0;
-    for(int i = 0; i < size; i++){
-      getWord(i, line).getChars(0, getWord(i, line).length(), tmp, count);
-      count += getWord(i, line).length();
-      if(i != (size - 1))
-        tmp[count++] = ' ';
-    }
-
-    return new String(tmp);
-  }
-
-//----------------------------------------------------------------------
-/**
- * Adds a line at the end of the line array.
- * Two dimensional array is the argument for the new line
- * @param words new line
- * @return void
- * @see #addEmptyLine
- * @see #setLine
- * @see #getLine
- * @see #deleteLine
- */
-
-  public void addLine(char[][] words){
-
-        // transform char[][] into String[]
-    String[] tmp = new String[words.length];
-    for(int i = 0; i < words.length; i++)
-      tmp[i] = new String(words[i]);
-
-    addLine(tmp);
-  }
-
-//----------------------------------------------------------------------
-/**
- * Adds a line at the end of the line array.
- * String array is the argument for the new line
- * @param words new line
- * @return void
- * @see #addEmptyLine
- * @see #setLine
- * @see #getLine
- * @see #deleteLine
- */
-
-  public void addLine(String[] words){
-
-        // create the new line
-    Line current_line = new Line();
-
-        // add words
-    for (String word : words )
-    {
-      current_line.addWord(word);
-    }
-        // add the new line at the end
-    lines_.add(current_line);
-  }
-
-//----------------------------------------------------------------------
-/**
- * Adds an empty line at the end of the lines array.
- * @param line line index
- * @return void
- * @see #setLine
- * @see #getLine
- * @see #getLineAsString
- * @see #addLine
- * @see #deleteLine
- */
-
-  public void addEmptyLine(){
-
-        // create the new line
-    Line current_line = new Line();
-
-        // add the new line at the end
-    current_line.addEmptyWord();
-
-    lines_.add(current_line);
-  }
-
-//----------------------------------------------------------------------
-/**
- * Deletes the line from the specified position.
- * @param line line index
- * @return void
- * @see #setLine
- * @see #getLine
- * @see #getLineAsString
- * @see #addLine
- * @see #addEmptyLine
- */
-
-  public void deleteLine(int line){
-
-        // delete the specified line
-    lines_.remove(line);
-  }
-
-//----------------------------------------------------------------------
-/**
- * Gets the number of lines
- * @return int
- */
-
-  public int getLineCount(){
-    return lines_.size();
-  }
 
 //----------------------------------------------------------------------
 /**
