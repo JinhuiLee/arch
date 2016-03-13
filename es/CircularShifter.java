@@ -1,23 +1,23 @@
 // -*- Java -*-
 /*
  * <copyright>
- * 
+ *
  *  Copyright (c) 2002
  *  Institute for Information Processing and Computer Supported New Media (IICM),
  *  Graz University of Technology, Austria.
- * 
+ *
  * </copyright>
- * 
+ *
  * <file>
- * 
+ *
  *  Name:    CircularShifter.java
- * 
+ *
  *  Purpose: Produces circular shifts of input lines
- * 
- *  Created: 05 Nov 2002 
- * 
+ *
+ *  Created: 05 Nov 2002
+ *
  *  $Id$
- * 
+ *
  *  Description:
  *    Produces circular shifts of input lines
  * </file>
@@ -32,14 +32,15 @@ package kwic.es;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.ArrayList;
-
+import java.util.StringTokenizer;
+import java.util.Arrays;
 /**
- *  CircularShifter class implemets the "Observer" part of the standard 
+ *  CircularShifter class implemets the "Observer" part of the standard
  *  "Observable"-"Observer" mechanism. Thus, an instance of CircularShifter
  *  class declares its interest in tracking changes in an object of LineStorage
  *  class, which holds the original lines read from a KWIC input file. Therefore,
- *  any event produced and sent by the LineStorageWrapper object whenever its internal 
- *  state is changed (i.e., whenever a new line has been added) is catched by 
+ *  any event produced and sent by the LineStorageWrapper object whenever its internal
+ *  state is changed (i.e., whenever a new line has been added) is catched by
  *  CircularShiter object. In turn, this leads to production of circular shifts for
  *  the newly added line. Circular shifts are kept within an CircularShifter object again
  *  in the form of a LineStorageWrapper object.
@@ -97,7 +98,7 @@ public class CircularShifter implements Observer{
 
         // cast to the event object
     LineStorageChangeEvent event = (LineStorageChangeEvent) arg;
-    
+
         // take actions depending on the type of the change
     switch(event.getType()){
 
@@ -107,30 +108,88 @@ public class CircularShifter implements Observer{
 
           // get the last added line
       String[] line = lines.getLine(lines.getLineCount() - 1);
-          
+
           // iterate through all words of the line
           // and make all shifts
       for(int i = 0; i < line.length; i++){
-        
+
             // create a new empty shift and add all words to it
         ArrayList words = new ArrayList();
         for(int j = i; j < (line.length + i); j++)
-          
+
               // add current word to the shift
               // index is the remainder of dividing j and line.length
           words.add(line[j % line.length]);
-        
+
             // create a String[] representation of the shift
         String[] line_rep = new String[words.size()];
         for(int k = 0; k < line_rep.length; k++)
           line_rep[k] = (String) words.get(k);
-            
+
               // add the new shift to the storage
         shifts_.addLine(line_rep);
       }
       break;
+    case LineStorageChangeEvent.DELETE:
+      String deletedStr = event.getArg();
+      StringTokenizer tokenizer = new StringTokenizer(deletedStr);
+          // if this is not an empty line keep the words so that we can add the line
+          // to the line storage
+      if(tokenizer.countTokens() > 0){
+
+            // keep the words
+        ArrayList words = new ArrayList();
+        while(tokenizer.hasMoreTokens())
+          words.add(tokenizer.nextToken());
+
+            // create a String[] representation of the line
+        String[] line_rep = new String[words.size()];
+        for(int i = 0; i < line_rep.length; i++)
+          line_rep[i] = (String) words.get(i);
+
+      line = new String[line_rep.length];
+      System.arraycopy(line_rep,0,line,0,line_rep.length);
+
+          // iterate through all words of the line
+          // and make all shifts
+      for(int i = 0; i < line.length; i++){
+
+            // create a new empty shift and add all words to it
+        words = new ArrayList();
+        for(int j = i; j < (line.length + i); j++)
+
+              // add current word to the shift
+              // index is the remainder of dividing j and line.length
+          words.add(line[j % line.length]);
+
+            // create a String[] representation of the shift
+        line_rep = new String[words.size()];
+        for(int k = 0; k < line_rep.length; k++)
+          line_rep[k] = (String) words.get(k);
+
+              // add the new shift to the storage
+              for (int j=0;j< shifts_.getLineCount();j++)
+              {
+                String needDeleting="";
+                for (String t:line_rep)
+                  needDeleting+=t+" ";
+                needDeleting=needDeleting.trim();
+                //System.out.println(shifts_.getLineAsString(j)+" |vs| "+tmp);
+                if (shifts_.getLineAsString(j).equals(needDeleting))
+                {
+                  shifts_.deleteLine(j);
+                }
+              }
+        }
+
+
+
+
+      }
+
+      break;
     default:
-      break;      
+      break;
     }
   }
 
