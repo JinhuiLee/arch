@@ -1,23 +1,23 @@
 // -*- Java -*-
 /*
  * <copyright>
- * 
+ *
  *  Copyright (c) 2002
  *  Institute for Information Processing and Computer Supported New Media (IICM),
  *  Graz University of Technology, Austria.
- * 
+ *
  * </copyright>
- * 
+ *
  * <file>
- * 
+ *
  *  Name:    KWIC.java
- * 
+ *
  *  Purpose: The Master Control class
- * 
- *  Created: 20 Sep 2002 
- * 
+ *
+ *  Created: 20 Sep 2002
+ *
  *  $Id$
- * 
+ *
  *  Description:
  *    The Master Control class
  * </file>
@@ -31,6 +31,8 @@ package kwic.pf;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 
 /**
  *  An object of the KWIC class creates the linear sequence (pipeline) of filters
@@ -86,26 +88,30 @@ public class KWIC{
  * @return void
  */
 
-  public void execute(String file){
+  public void execute(String file,String noise_file){
     try{
-      
+
           // pipes
       Pipe in_cs = new Pipe();
-      Pipe cs_al = new Pipe();
+      Pipe cs_sf = new Pipe();
+      Pipe sf_al = new Pipe();
       Pipe al_ou = new Pipe();
-      
+
           // input file
       FileInputStream in = new FileInputStream(file);
-
+      FileInputStream noise_f = new FileInputStream(noise_file);
+      BufferedReader br = new BufferedReader(new InputStreamReader(noise_f));
+      String noise = br.readLine();
           // filters connected into a pipeline
       Input input = new Input(in, in_cs);
-      CircularShifter shifter = new CircularShifter(in_cs, cs_al);
-      Alphabetizer alpha = new Alphabetizer(cs_al, al_ou);
+      CircularShifter shifter = new CircularShifter(in_cs, cs_sf);
+      ShiftFilter sfilter = new ShiftFilter(cs_sf,sf_al,noise);
+      Alphabetizer alpha = new Alphabetizer(sf_al, al_ou);
       Output output = new Output(al_ou);
-      
           // run it
       input.start();
       shifter.start();
+      sfilter.start();
       alpha.start();
       output.start();
     }catch(IOException exc){
@@ -115,9 +121,9 @@ public class KWIC{
 
 //----------------------------------------------------------------------
 /**
- * Main function checks the command line arguments. The program expects 
- * exactly one command line argument specifying the name of the file 
- * that contains the data. If the program has not been started with 
+ * Main function checks the command line arguments. The program expects
+ * exactly one command line argument specifying the name of the file
+ * that contains the data. If the program has not been started with
  * proper command line arguments, main function exits
  * with an error message. Otherwise, a KWIC instance is created and program
  * control is passed to it.
@@ -126,13 +132,13 @@ public class KWIC{
  */
 
   public static void main(String[] args){
-    if(args.length != 1){
-      System.err.println("KWIC Usage: java kwic.ms.KWIC file_name");
+    if(args.length != 2){
+      System.err.println("KWIC Usage: java kwic.ms.KWIC file_name noise_file_name");
       System.exit(1);
     }
 
     KWIC kwic = new KWIC();
-    kwic.execute(args[0]);
+    kwic.execute(args[0],args[1]);
   }
 
 //----------------------------------------------------------------------
