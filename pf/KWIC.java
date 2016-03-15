@@ -94,8 +94,10 @@ public class KWIC{
           // pipes
       Pipe in_cs = new Pipe();
       Pipe cs_sf = new Pipe();
-      Pipe sf_al = new Pipe();
+      Pipe sf_lt = new Pipe();
+      Pipe lt_al = new Pipe();
       Pipe al_ou = new Pipe();
+  
 
           // input file
       FileInputStream in = new FileInputStream(file);
@@ -105,14 +107,16 @@ public class KWIC{
           // filters connected into a pipeline
       Input input = new Input(in, in_cs);
       CircularShifter shifter = new CircularShifter(in_cs, cs_sf);
-      ShiftFilter sfilter = new ShiftFilter(cs_sf,sf_al,noise);
-      Alphabetizer alpha = new Alphabetizer(sf_al, al_ou);
+      ShiftFilter sfilter = new ShiftFilter(cs_sf,sf_lt,noise);
+      LineTransformer lt = new LineTransformer(sf_lt,lt_al);
+      Alphabetizer alpha = new Alphabetizer(lt_al, al_ou);
       Output output = new Output(al_ou);
           // run it
       input.start();
       shifter.start();
       sfilter.start();
       alpha.start();
+      lt.start();
       output.start();
     }catch(IOException exc){
       exc.printStackTrace();
