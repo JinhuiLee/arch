@@ -512,7 +512,12 @@ public class KWIC{
     {
       if (i<shift_index.length-1)
       for (int j=shift_index[i];j<shift_index[i+1];j++)
+      {
+        if (shift_chars[shift_index[i]]>='0' && shift_chars[shift_index[i]]<='9')
+          continue;
         System.out.print(shift_chars[j]);
+
+      }
       System.out.println();
     }
   }
